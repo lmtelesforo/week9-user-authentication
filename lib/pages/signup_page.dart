@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'package:email_validator/email_validator.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -92,8 +93,14 @@ class _SignUpState extends State<SignUpPage> {
           onSaved: (value) => setState(() => email = value),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return "Please enter a valid email format";
+              return "Please enter a valid email";
             }
+            if ((EmailValidator.validate(value)) != true) { // call email validator function from email validator package to check email format
+              return "Please enter a valid email format (e.g. xxx@xxx.com)";
+            }
+            if (value == "" || value.trim().isEmpty) {
+              return "Please enter a valid email";
+            } // additional checkers for null inputs
             return null;
           },
         ),

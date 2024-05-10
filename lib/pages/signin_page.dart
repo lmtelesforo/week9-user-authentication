@@ -1,4 +1,4 @@
-
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -62,6 +62,9 @@ class _SignInPageState extends State<SignInPage> {
             if (value == null || value.isEmpty) {
               return "Please enter your email";
             }
+            if ((EmailValidator.validate(value)) != true) {
+              return "Please enter a valid email format (e.g. xxx@xxx.com)";
+            } // added invalid email error message
             return null;
           },
         ),
@@ -80,6 +83,9 @@ class _SignInPageState extends State<SignInPage> {
             if (value == null || value.isEmpty) {
               return "Please enter your password";
             }
+            if (value.length < 6) {
+              return "Password must be at least 6 characters";
+            } // password must be at least 6 chars
             return null;
           },
         ),
