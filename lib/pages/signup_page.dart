@@ -11,6 +11,8 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  String? firstname;
+  String? lastname;
   String? email;
   String? password;
 
@@ -25,7 +27,7 @@ class _SignUpState extends State<SignUpPage> {
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [heading, emailField, passwordField, submitButton],
+                children: [heading, firstnameField, lastnameField, emailField, passwordField, submitButton] // added more fields for last name and first name
               ),
             )),
       ),
@@ -37,6 +39,46 @@ class _SignUpState extends State<SignUpPage> {
         child: Text(
           "Sign Up",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+      );
+
+  Widget get firstnameField => Padding( // field for first name
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("First name"),
+              hintText: "Enter your first name"),
+          onSaved: (value) => setState(() => firstname = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your first name";
+            }
+            if (value == "" || value.trim().isEmpty) {
+              return "Please enter your first name";
+            } // additional checkers for null inputs
+            return null;
+          },
+        ),
+      );
+
+  Widget get lastnameField => Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("Last name"),
+              hintText: "Enter your last name"),
+          onSaved: (value) => setState(() => lastname = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your last name";
+            }
+            if (value == "" || value.trim().isEmpty) {
+              return "Please enter your last name";
+            } // additional checkers for null inputs
+            return null;
+          },
         ),
       );
 
