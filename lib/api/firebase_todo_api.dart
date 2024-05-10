@@ -46,4 +46,11 @@ class FirebaseTodoAPI {
       return "Error in ${e.code}: ${e.message}";
     }
   }
+
+  Stream<QuerySnapshot> getTodosByEmail(String email) { // filter todos by email of user na nagpost nun
+    return db
+    .collection("todos")
+    .where("email", isEqualTo: email)
+    .snapshots();
+  }
 }

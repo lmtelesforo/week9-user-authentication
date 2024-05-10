@@ -4,17 +4,25 @@
   Description: Sample todo app with Firebase 
 */
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:week9_authentication/providers/auth_provider.dart';
 import '../models/todo_model.dart';
 import '../providers/todo_provider.dart';
 
 class TodoModal extends StatelessWidget {
   final String type;
   final Todo? item;
+  User? user;
+  late String userEmail;
   final TextEditingController _formFieldController = TextEditingController();
 
-  TodoModal({super.key, required this.type, required this.item});
+  TodoModal({super.key, required this.type, required this.item}) {
+    user = FirebaseAuth.instance.currentUser; // get current user from authentication
+
+    userEmail = user!.email!; // save value
+  }
 
   // Method to show the title of the modal depending on the functionality
   Text _buildTitle() {
@@ -56,9 +64,9 @@ class TodoModal extends StatelessWidget {
         switch (type) {
           case 'Add':
             {
-              // Instantiate a todo objeect to be inserted, default userID will be 1, the id will be the next id in the list
+              // Instantiate a todo objeect to be inserted, userEmail is the email of the current user
               Todo temp = Todo(
-                  userId: 1,
+                  email: userEmail,
                   completed: false,
                   title: _formFieldController.text);
 

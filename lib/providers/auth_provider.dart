@@ -21,8 +21,8 @@ class UserAuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signUp(String email, String password) async {
-    await authService.signUp(email, password);
+  Future<void> signUp(String firstname, String lastname, String email, String password) async { // only added first name and last name fields
+    await authService.signUp(firstname, lastname, email, password);
     notifyListeners();
   }
 
@@ -38,3 +38,4 @@ class UserAuthProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+

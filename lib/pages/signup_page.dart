@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:week9_authentication/api/firebase_auth_api.dart';
+import 'package:week9_authentication/providers/firebase_provider.dart';
 import '../providers/auth_provider.dart';
 import 'package:email_validator/email_validator.dart';
+import '../providers/firebase_provider.dart'; 
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -16,6 +19,14 @@ class _SignUpState extends State<SignUpPage> {
   String? lastname;
   String? email;
   String? password;
+  late String signUpResult;
+  late Map<String, dynamic> user;
+
+  bool validateStructure(String value){
+    String  pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(value);
+  } // thank you to my reference i owe u my life
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +123,25 @@ class _SignUpState extends State<SignUpPage> {
           decoration: const InputDecoration(
               border: OutlineInputBorder(),
               label: Text("Password"),
-              hintText: "At least 8 characters"),
+              hintText: "At least 6 characters"),
           obscureText: true,
           onSaved: (value) => setState(() => password = value),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please enter a valid password";
             }
+            if (value.length < 6) {
+              return "Password must be at least 6 characters";
+            }
+            if (validateStructure(value) != true) { // call password format regex checker
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Password must have at least 1 small letter, 1 capital letter, 1 digit, and 1 special character')),
+              ); // show correct format guide
+              return "Password format invalid";
+            }
+            if (value == "" || value.trim().isEmpty) {
+              return "Please enter a valid password";
+            } // additional checkers for null inputs
             return null;
           },
         ),
@@ -128,13 +151,37 @@ class _SignUpState extends State<SignUpPage> {
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
           _formKey.currentState!.save();
-          await context
-              .read<UserAuthProvider>()
-              .authService
-              .signUp(email!, password!);
+          // declare all variables from above
+          final firstName = firstname!;
+          final lastName = lastname!;
+          final userEmail = email!;
+          final userPassword = password!;
 
-          // check if the widget hasn't been disposed of after an asynchronous action
-          if (mounted) Navigator.pop(context);
+          final user = UserInfosProvider().userData(firstName, lastName, userEmail); // call function from UserInfosProvider or firebase_provider to save all data in a Map<String, dynamic>
+
+          final authService = Provider.of<UserAuthProvider>(context, listen: false).authService; // declare providers para magamit yung individual functions nila
+          final userInfos = Provider.of<UserInfosProvider>(context, listen: false);
+
+          // check if sign up was successful authService side (auth_provider)
+          signUpResult = (await authService.signUp(firstName, lastName, userEmail, userPassword))!; // gets string message
+
+          if (signUpResult == 'The account already exists for that email.') { // match error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Account already exists!')),
+            );
+          }
+          else {
+            // successful, call function from UserInfosProvider 
+            userInfos.addUser(user);
+
+            // check if the widget hasn't been disposed of after an asynchronous action
+            if (mounted) { // successful, pop current page
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('User signed up successfully!')),
+              );
+            }
+          }
         }
       },
       child: const Text("Sign Up"));

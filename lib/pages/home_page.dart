@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.waiting) {
+            context.read<UserAuthProvider>().fetchAuthentication(); // get current user to load their todos
             return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
