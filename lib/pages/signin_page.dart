@@ -18,6 +18,12 @@ class _SignInPageState extends State<SignInPage> {
   String? password;
   bool showSignInErrorMessage = false;
 
+  bool validateStructure(String value){
+    String  pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(value);
+  } // thank you to my reference i owe u my life
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +92,12 @@ class _SignInPageState extends State<SignInPage> {
             if (value.length < 6) {
               return "Password must be at least 6 characters";
             } // password must be at least 6 chars
+            if (validateStructure(value) != true) { // call password format regex checker
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Password must have at least 1 small letter, 1 capital letter, 1 digit, and 1 special character')),
+              ); // show correct format guide
+              return "Password format invalid";
+            }
             return null;
           },
         ),
